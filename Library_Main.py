@@ -71,10 +71,12 @@ def see_Books():
                   cell = []
       print(myTable)
       print("\n")
-
+      return()
+      '''
       confirmation = input("Would you like to add another book to this list? Y/N: ")
       if confirmation == "y" or confirmation == "Y":
             add_Book()
+      '''
 
 def average_Rating():
       column = 3
@@ -82,10 +84,9 @@ def average_Rating():
       row = 2
       ratings = []
       ratingSum = 0
-      for i in range(2, maxRow):
-            ratings.append(sheet.cell(i, column).value)
-      for n in range(1, maxRow-2):
-            ratingSum += int(ratings[n])
+      for i in range(2, maxRow+1):
+            ratings.append(int(sheet.cell(i, column).value))
+      ratingSum = sum(ratings)
       ratingAverage = round(ratingSum / (maxRow - 1), 2)
       print(f"The average rating across your books is {ratingAverage}")
       print("\n")
