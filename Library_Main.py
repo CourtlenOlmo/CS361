@@ -31,9 +31,12 @@ def add_Book():
       author = input("What is the name of the author: ")
       rating = input("Enter a rating for this book between 1-10: ")
       quote = input(
-            "If you'd like, enter a favorite quote here, or enter 0 to add your book and return to the main menu: ")
+            "If you'd like, enter a favorite quote here, or leave it blank if you plan to input it later: ")
       if quote == 0 or None:
             quote = ""
+      confirmation = input(f"Would you like to enter {title} by {author}? Enter Y/N: ")
+      if confirmation == "n" or confirmation == "N":
+            return()
 
       entry = (author, title, rating, quote)
 
@@ -48,9 +51,9 @@ def see_Books():
 
       """Create the table to be used"""
       myTable = PrettyTable(["Author", "Title", "Rating", "Quotes"])
-      row = str(sheet.max_row)
+      max_row = str(sheet.max_row)
       column = sheet.max_column
-      cell = sheet["A1":"D"+row]
+      cell = sheet["A1":"D"+max_row]
       data = [list(elem) for elem in cell]
       cell = []
       row = 2
@@ -63,9 +66,30 @@ def see_Books():
             if column < 4:
                   column += 1
             row += 1
-            myTable.add_row([cell[0].value,cell[1].value,cell[2].value,cell[3].value])
-            cell = []
+            if row <= int(max_row)+1:
+                  myTable.add_row([cell[0].value,cell[1].value,cell[2].value,cell[3].value])
+                  cell = []
       print(myTable)
+      print("\n")
+
+      confirmation = input("Would you like to add another book to this list? Y/N: ")
+      if confirmation == "y" or confirmation == "Y":
+            add_Book()
+
+def average_Rating():
+      column = 3
+      maxRow = sheet.max_row
+      row = 2
+      ratings = []
+      ratingSum = 0
+      for i in range(2, maxRow):
+            ratings.append(sheet.cell(i, column).value)
+      for n in range(1, maxRow-2):
+            ratingSum += int(ratings[n])
+      ratingAverage = round(ratingSum / (maxRow - 1), 2)
+      print(f"The average rating across your books is {ratingAverage}")
+      print("\n")
+      return()
 
 def main_Menu():
       selection = ""
@@ -73,7 +97,7 @@ def main_Menu():
             print("Welcome to Bookkeeper, this program will help you track the books you've read by storing them in an excel document\n\n"
                   "Enter 1 to add a new book\n"
                   "Enter 2 to see the books in your collection\n"
-                  "Enter 3 add your favorite quotes to a book\n"
+                  "Enter 3 see the average rating of your books\n"
                   "Enter 0 to exit the program\n"
                   "Please only enter numbers between 0-3\n")
             selection = input("Enter your selection here: ")
@@ -84,6 +108,8 @@ def main_Menu():
                   add_Book()
             elif selection == "2":
                   see_Books()
+            elif selection == "3":
+                  average_Rating()
       exit()
 
 if __name__ == "__main__":
