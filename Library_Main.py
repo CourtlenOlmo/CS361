@@ -2,6 +2,7 @@ from openpyxl import Workbook
 import openpyxl
 import os
 from prettytable import PrettyTable
+import zmq
 
 if os.path.isfile("Bookkeeper.xlsx"):
       """Check if the file exists, open the file if it does"""
@@ -72,11 +73,25 @@ def see_Books():
       print(myTable)
       print("\n")
       return()
-      '''
-      confirmation = input("Would you like to add another book to this list? Y/N: ")
-      if confirmation == "y" or confirmation == "Y":
-            add_Book()
-      '''
+
+def lookUp_Book():
+    context = zmq.Context()
+    print(">>> Client attempting to connect to server...")
+    socket = context.socket(zmq.REQ)
+    socket.connect(f"tcp://localhost:5555")
+
+    while True:
+        input_string = input("Enter a book to lookup, or enter Q to quit: ")
+        if input_string.upper() == "Q":
+            print(f">>> Exiting Program...")
+            context.destroy()
+            break
+        else:
+            print(f">>> Sending request...")
+            socket.send_string(input_string)
+            message = socket.recv()
+            print(f">>> Server sent back: {message.decode()}")
+    context.destroy()
 
 def average_Rating():
       column = 3
@@ -92,6 +107,19 @@ def average_Rating():
       print("\n")
       return()
 
+def add_goal():
+      context = zmq.Context()
+      print(">>> Client attempting to connect to server...")
+      socket = context.socket(zmq.REQ)
+      socket.connect(f"tcp://localhost:5556")
+
+      while True:
+            input_string = input("enter the amount of hours you would like to read this week: ")
+            print(f">>> Sending request...")
+            socket.send_string(input_string)
+            break
+      context.destroy()
+
 def main_Menu():
       selection = ""
       while selection != 0:
@@ -99,6 +127,8 @@ def main_Menu():
                   "Enter 1 to add a new book\n"
                   "Enter 2 to see the books in your collection\n"
                   "Enter 3 see the average rating of your books\n"
+                  "Enter 4 to find an amazon link for a book\n"
+                  "Enter 5 to add a weekly goal to your text file\n"
                   "Enter 0 to exit the program\n"
                   "Please only enter numbers between 0-3\n")
             selection = input("Enter your selection here: ")
@@ -111,6 +141,10 @@ def main_Menu():
                   see_Books()
             elif selection == "3":
                   average_Rating()
+            elif selection == "4":
+                  lookUp_Book()
+            elif selection == "5":
+                  add_goal()
       exit()
 
 if __name__ == "__main__":
