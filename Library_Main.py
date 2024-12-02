@@ -68,7 +68,7 @@ def see_Books():
                   column += 1
             row += 1
             if row <= int(max_row)+1:
-                  myTable.add_row([cell[0].value,cell[1].value,cell[2].value,cell[3].value])
+                  myTable.add_row([cell[0].value, cell[1].value, cell[2].value, cell[3].value])
                   cell = []
       print(myTable)
       print("\n")
@@ -82,6 +82,25 @@ def lookUp_Book():
 
     while True:
         input_string = input("Enter a book to lookup, or enter Q to quit: ")
+        if input_string.upper() == "Q":
+            print(f">>> Exiting Program...")
+            context.destroy()
+            break
+        else:
+            print(f">>> Sending request...")
+            socket.send_string(input_string)
+            message = socket.recv()
+            print(f">>> Server sent back: {message.decode()}")
+    context.destroy()
+
+def lookUp_Genre():
+    context = zmq.Context()
+    print(">>> Client attempting to connect to server...")
+    socket = context.socket(zmq.REQ)
+    socket.connect(f"tcp://localhost:5557")
+
+    while True:
+        input_string = input("Enter a genre to lookup, or enter Q to quit: ")
         if input_string.upper() == "Q":
             print(f">>> Exiting Program...")
             context.destroy()
@@ -120,15 +139,33 @@ def add_goal():
             break
       context.destroy()
 
+def find_Quote():
+    context = zmq.Context()
+    print(">>> Client attempting to connect to server...")
+    socket = context.socket(zmq.REQ)
+    socket.connect(f"tcp://localhost:5558")
+
+    while True:
+        input_string = "printBook"
+        print(f"\n>>> Sending request...")
+        socket.send_string(input_string)
+        request = socket.recv()
+        quote = request.decode()
+        print(quote)
+        break
+    context.destroy()
+
 def main_Menu():
       selection = ""
       while selection != 0:
             print("Welcome to Bookkeeper, this program will help you track the books you've read by storing them in an excel document\n\n"
                   "Enter 1 to add a new book\n"
-                  "Enter 2 to see the books in your collection\n"
-                  "Enter 3 see the average rating of your books\n"
+                  "Enter 2 see the average rating of your books\n"
+                  "Enter 3 to see the books in your collection\n"
                   "Enter 4 to find an amazon link for a book\n"
-                  "Enter 5 to add a weekly goal to your text file\n"
+                  "Enter 5 to see the latest best sellers for a genre\n"
+                  "Enter 6 to add a weekly goal to your text file\n"
+                  "Enter 7 to print a quote from a book\n"
                   "Enter 0 to exit the program\n"
                   "Please only enter numbers between 0-3\n")
             selection = input("Enter your selection here: ")
@@ -138,13 +175,17 @@ def main_Menu():
             if selection == "1":
                   add_Book()
             elif selection == "2":
-                  see_Books()
-            elif selection == "3":
                   average_Rating()
+            elif selection == "3":
+                  see_Books()
             elif selection == "4":
                   lookUp_Book()
             elif selection == "5":
+                  lookUp_Genre()
+            elif selection == "6":
                   add_goal()
+            elif selection == "7":
+                  find_Quote()
       exit()
 
 if __name__ == "__main__":
